@@ -18,20 +18,17 @@ TOKEN = "ВАШ_ТЕЛЕГРАМ_ТОКЕН"
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Тимчасове збереження даних користувачів (у реальному проєкті тут має бути БД)
 user_data = {}
 
-# --- БЛОК БІЗНЕС-ЛОГІКИ (ОБРОБКА ДАНИХ) ---
-
+# --- BUSINESS LOGIC ---
 def parse_and_validate_numbers(text: str) -> list[float]:
     """
     Розумний парсер: знаходить усі числа в тексті (цілі та дробові),
     ігноруючи літери та зайві символи. Захищає від спаму обмеженням кількості.
     """
-    # Регулярний вираз для пошуку чисел (наприклад: 12; 4.5; -7)
     numbers = [float(n) for n in re.findall(r"[-+]?\d*\.\d+|\d+", text)]
     
-    if len(numbers) > 500:  # Захист від перевантаження системи
+    if len(numbers) > 500:
         raise ValueError("Занадто великий масив даних. Максимум 500 чисел.")
     if not numbers:
         raise ValueError("У повідомленні не знайдено жодного числа. Спробуйте ще раз.")
@@ -46,7 +43,7 @@ def calculate_analytics(numbers: list[float]) -> dict:
     analytics = {
         "count": len(arr),
         "sum": float(np.sum(arr)),
-        "mean": float(np.mean(arr)),  # Середній чек / показник
+        "mean": float(np.mean(arr)),
         "max": float(np.max(arr)),
         "min": float(np.min(arr)),
         "median": float(np.median(arr)),
@@ -67,16 +64,13 @@ def generate_analytics_chart(numbers: list[float]) -> io.BytesIO:
     plt.grid(True, linestyle=':', alpha=0.6)
     plt.legend()
     
-    # Збереження графіку в буфер пам'яті (без створення файлу на диску)
     img_buf = io.BytesIO()
     plt.savefig(img_buf, format='png', bbox_inches='tight')
     img_buf.seek(0)
     plt.close()
     return img_buf
 
-# --- БЛОК ІНТЕРФЕЙСУ (AIOGRAM HANDLERS) ---
-
-# Головне меню з кнопками для UX
+# --- UI & HANDLERS ---
 def get_main_keyboard():
     buttons = [
         [KeyboardButton(text="📊 Отримати аналітичний звіт")],
@@ -143,7 +137,6 @@ async def handle_data_input(message: Message):
     """Обробник вхідного тексту з числами"""
     user_id = message.from_user.id
     try:
-        # Парсимо числа з будь-якого тексту користувача
         parsed_numbers = parse_and_validate_numbers(message.text)
         user_data[user_id] = parsed_numbers
         
