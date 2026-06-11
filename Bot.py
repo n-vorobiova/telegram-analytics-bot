@@ -9,9 +9,7 @@ from aiogram.filters import CommandStart
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Налаштування логування для моніторингу роботи бота
 logging.basicConfig(level=logging.INFO)
-
 
 TOKEN = "ВАШ_ТЕЛЕГРАМ_ТОКЕН"
 
